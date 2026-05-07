@@ -70,6 +70,49 @@ STEPS=20 GUIDANCE=1.5 bash scripts/run_latentsync_1_6.sh
 - `ENABLE_DEEPCACHE=0`: desliga DeepCache se houver instabilidade.
 - `USE_16K_AUDIO=1`: usa o WAV mono/16 kHz gerado no preflight para depuracao. Para resultado final, prefira o audio original.
 
+## Estimativa de custo/performance
+
+Baseline real medido em Vast.ai:
+
+- GPU: NVIDIA A40
+- Video: 2m30s
+- Tempo de processamento: cerca de 40 min
+- Preco: US$ 0.357/h
+- Custo observado: cerca de US$ 0.095 por minuto de video processado
+
+Formula:
+
+```text
+custo por minuto de video = preco_hora * minutos_processando / 150
+```
+
+Tabela estimada com precos informados em Vast.ai:
+
+| GPU | Preco/h | Tempo estimado p/ 2m30s | US$/min video |
+| --- | ---: | ---: | ---: |
+| 4090 | 0.397 | 17-24 min | 0.045-0.064 |
+| RTX PRO 6000 WS | 0.950 | 7-12 min | 0.044-0.076 |
+| RTX 5880 Ada | 0.381 | 21-29 min | 0.053-0.074 |
+| L40 | 0.434 | 18-25 min | 0.052-0.072 |
+| RTX 6000 Ada | 0.541 | 16-23 min | 0.058-0.083 |
+| A100 SXM4 | 0.542 | 18-25 min | 0.065-0.090 |
+| A40 | 0.357 | 40 min real | 0.095 |
+
+Leitura pratica:
+
+- A 4090 tende a ser a melhor em custo por minuto, se a VRAM for suficiente e o host for confiavel.
+- A RTX 5880 Ada parece uma boa alternativa com 48 GB.
+- L40 e RTX 6000 Ada sao boas opcoes estaveis, mas precisam vencer pelo tempo real.
+- RTX PRO 6000 WS pode ser a mais rapida, mas so compensa se ficar perto do limite baixo da estimativa.
+- A100 SXM4 e A40 nao parecem as melhores opcoes para custo por minuto neste pipeline.
+- Se o item `RTX 6000` for a antiga Quadro RTX 6000/Turing, evitar; se for Ada, usar a linha `RTX 6000 Ada`.
+
+Para comparar provedores/GPU, rode sempre o mesmo clipe:
+
+```bash
+time bash scripts/run_latentsync_1_6.sh
+```
+
 ## Arquivos gerados
 
 Pastas ignoradas pelo git:
